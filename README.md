@@ -22,10 +22,10 @@ Recommended installation is using [npm](http://github.com/isaacs/npm)
 
     var discogs = require('discogs');
 
-    var client = discogs.discogs({api_key: 'foo4711'});
+    var client = discogs({api_key: 'foo4711'});
 
-    client.artist('Jay-Z', function(err, artist) {
-        console.log(artist.realname); // Shawn Corey Carter
+    client.artist('Marcus Price', function(err, artist) {
+        console.log(artist.name); // Marcus Price
     });
 
 ## Credits

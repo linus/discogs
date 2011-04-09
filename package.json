@@ -1,7 +1,7 @@
 {
   "name": "discogs",
   "description": "Simple client for Discogs API",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": "Linus G Thiel <linus@hanssonlarsson.se> (http://hanssonlarsson.se/)",
   "contributors": [ 
     { "name": "Linus G Thiel", "email": "linus@hanssonlarsson.se" }

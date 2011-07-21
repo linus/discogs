@@ -12,4 +12,4 @@ clean-docs:
 clean: clean-docs
 
 dist: clean init docs
-	coffee -c discogs.coffee
+	coffee -o lib/ -c src/

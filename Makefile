@@ -4,7 +4,7 @@ init:
 	npm install --dev
 
 docs:
-	docco *.coffee
+	docco src/*.coffee
 
 clean-docs:
 	rm -rf docs/

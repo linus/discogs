@@ -4,48 +4,36 @@ compress    = require 'compress'
 
 # This is the entry point.
 #
-# Needs a [Discogs API key](https://www.discogs.com/users/login).
+# Takes an optional format parameter, defaulting to 'json'. If 'xml' consumer is expected to take care of parsing
 #
-# Takes an object as such:
-#
-#     config = {
-#       api_key: 'string'   # Required.
-#       f:       'json|xml' # Optional, defaults to 'json'. If 'xml' consumer is expected to take care of parsing
-#     }
-#
-#     client = discogs({api_key: 'foo4711'})
-exports = module.exports = (config) ->
-  _config = {}
-  _config.api_key = config.api_key
-  # Default format
-  _config.f = config.f or 'json'
-  params = querystring.stringify(_config)
-
+#     client = discogs("xml")
+exports = module.exports = (format) ->
   gunzip = new compress.Gunzip()
   gunzip.init()
 
-  # Return a proper url with api_key and format
+  # Return a proper url with optional format
   getUrl = (url) ->
-    url = "http://www.discogs.com/#{encodeURIComponent(url)}" if url.substr(0, 7) isnt 'http://'
     sep = if "?" in url then "&" else "?"
+    url = "http://api.discogs.com/#{url}" if url.substr(0, 7) isnt 'http://'
 
-    "#{url}#{sep}#{params}"
+    url += "#{sep}f=#{format}" if format
+    url
 
   # Make a request
   discogsRequest = (url, next) ->
     request
-      uri: getUrl(url),
-      headers: {'accept-encoding': 'gzip'},
-      encoding: 'binary',
+      uri: getUrl url
+      headers: {'accept-encoding': 'gzip'}
+      encoding: 'binary'
       (error, res, body) =>
         if not error and 200 <= res.statusCode < 400
           if body
             body = gunzip.inflate(body) if 'gzip' in res.headers['content-type']
-            body = JSON.parse(body) if 'json' in res.headers['content-type'] or _config.f is 'json'
+            body = JSON.parse(body) if 'json' in res.headers['content-type'] or not format
 
-          next(null, body)
+          next null, body
         else
-          next(error)
+          next error
 
   responseHandler = (type, next) ->
     (err, res) ->

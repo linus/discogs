@@ -9,21 +9,20 @@
   querystring = require('querystring');
   request = require('request');
   compress = require('compress');
-  exports = module.exports = function(config) {
-    var discogsRequest, getUrl, gunzip, params, responseHandler, _config;
-    _config = {};
-    _config.api_key = config.api_key;
-    _config.f = config.f || 'json';
-    params = querystring.stringify(_config);
+  exports = module.exports = function(format) {
+    var discogsRequest, getUrl, gunzip, responseHandler;
     gunzip = new compress.Gunzip();
     gunzip.init();
     getUrl = function(url) {
       var sep;
-      if (url.substr(0, 7) !== 'http://') {
-        url = "http://www.discogs.com/" + (encodeURIComponent(url));
-      }
       sep = __indexOf.call(url, "?") >= 0 ? "&" : "?";
-      return "" + url + sep + params;
+      if (url.substr(0, 7) !== 'http://') {
+        url = "http://api.discogs.com/" + url;
+      }
+      if (format) {
+        url += "" + sep + "f=" + format;
+      }
+      return url;
     };
     discogsRequest = function(url, next) {
       return request({
@@ -39,7 +38,7 @@
             if (__indexOf.call(res.headers['content-type'], 'gzip') >= 0) {
               body = gunzip.inflate(body);
             }
-            if (__indexOf.call(res.headers['content-type'], 'json') >= 0 || _config.f === 'json') {
+            if (__indexOf.call(res.headers['content-type'], 'json') >= 0 || !format) {
               body = JSON.parse(body);
             }
           }

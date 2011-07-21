@@ -1,1 +1,1 @@
-exports = require("./lib/discogs")
+module.exports = require("./lib/discogs")

@@ -4,7 +4,7 @@ Discogs: A simple JavaScript wrapper for the Discogs API
 `discogs` is a simple wrapper for the [Discogs API](http://www.discogs.com/help/api), written in CoffeeScript and usable in e.g. Node.js.
 
 ## Version
-0.2.0
+0.2.1
 
 ## Requirements
 
@@ -36,7 +36,8 @@ Linus G Thiel &lt;linus@hanssonlarsson.se&gt;
 
 - [Discogs](http://discogs.com/) for an outstanding service and a great API
 - [Ryan Dahl](http://github.com/ry) for the awesome Node.js
-- [Jeremy Ashkenas](http://github.com/jashkenas) for the beautiful CoffeeScript
+- [Jeremy Ashkenas](http://github.com/jashkenas) for the beautiful CoffeeScript and Docco
+- [Mikeal Rogers](http://github.com/mikeal) for request
 
 ## License 
 

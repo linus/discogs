@@ -47,6 +47,11 @@ exports = module.exports = (format) ->
     discogsRequest url, next
 
   # Get a release
+  master: (id, next) ->
+    discogsRequest 'master/' + id,
+      responseHandler('master', next)
+
+  # Get a release
   release: (id, next) ->
     discogsRequest 'release/' + id,
       responseHandler('release', next)

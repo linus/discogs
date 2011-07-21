@@ -60,6 +60,9 @@
       get: function(url, next) {
         return discogsRequest(url, next);
       },
+      master: function(id, next) {
+        return discogsRequest('master/' + id, responseHandler('master', next));
+      },
       release: function(id, next) {
         return discogsRequest('release/' + id, responseHandler('release', next));
       },

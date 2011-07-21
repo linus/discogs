@@ -28,9 +28,9 @@ exports = module.exports = (config) ->
   getUrl = (url) ->
     url = "http://www.discogs.com/#{encodeURIComponent(url)}" if url.substr(0, 7) isnt 'http://'
     sep = if "?" in url then "&" else "?"
-  
+
     "#{url}#{sep}#{params}"
-  
+
   # Make a request
   discogsRequest = (url, next) ->
     request
@@ -46,39 +46,39 @@ exports = module.exports = (config) ->
           next(null, body)
         else
           next(error)
-  
+
   responseHandler = (type, next) ->
     (err, res) ->
       return next(err, res) if err or res not instanceof Object or type not of res?.resp
       next(null, res.resp[type])
 
-  return {
-    # Use this if you have a discogs url
-    get: (url, next) ->
-      discogsRequest url, next
-    
-    # Get a release
-    release: (id, next) ->
-      discogsRequest 'release/' + id,
-        responseHandler('release', next)
-    
-    # Get an artist
-    artist: (name, next) ->
-      discogsRequest 'artist/' + name,
-        responseHandler('artist', next)
+  # API
 
-    # Get a label
-    label: (name, next) ->
-      discogsRequest 'label/' + name,
-        responseHandler('label', next)
-    
-    # Search for something
-    # Valid types:
-    # `all`, `artists`, `labels`, `releases`, `needsvote`, `catno`, `forsale`
-    search: (query, type, next) ->
-      if type instanceof Function
-        next = type
-        type = 'all'
-      discogsRequest 'search?' + querystring.stringify(type: type, q: query),
-        responseHandler('search', next)
-    }
+  # Use this if you have a discogs url
+  get: (url, next) ->
+    discogsRequest url, next
+
+  # Get a release
+  release: (id, next) ->
+    discogsRequest 'release/' + id,
+      responseHandler('release', next)
+
+  # Get an artist
+  artist: (name, next) ->
+    discogsRequest 'artist/' + name,
+      responseHandler('artist', next)
+
+  # Get a label
+  label: (name, next) ->
+    discogsRequest 'label/' + name,
+      responseHandler('label', next)
+
+  # Search for something
+  # Valid types:
+  # `all`, `artists`, `labels`, `releases`, `needsvote`, `catno`, `forsale`
+  search: (query, type, next) ->
+    if type instanceof Function
+      next = type
+      type = 'all'
+    discogsRequest 'search?' + querystring.stringify(type: type, q: query),
+      responseHandler('search', next)

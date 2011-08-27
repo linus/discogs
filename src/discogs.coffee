@@ -83,7 +83,7 @@ exports = module.exports = (format) ->
       return next err if err
 
       results = res?.searchresults?.results
-      return next new Error "No hits" unless results
+      return next() unless results
 
       masters = (result for result in results when result.type is "master")
       # Did we find masters already?

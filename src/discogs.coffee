@@ -99,7 +99,11 @@ exports = module.exports = (format) ->
       @[release.type] id, (err, res) =>
         if "master_id" of res
           # Did we find a master now?
-          @master res.master_id, next
+          @master res.master_id, (err, master) =>
+            if "main_release" of master
+              @release master.main_release, next
+            else
+              next null, master
         else if "main_release" of res
           # Or maybe a main release?
           @release res.main_release, next

@@ -75,3 +75,34 @@ exports = module.exports = (format) ->
       type = 'all'
     discogsRequest 'search?' + querystring.stringify(type: type, q: query),
       responseHandler('search', next)
+
+  # Do a search and try to find the master or main release in all results.
+  # Uses 2 or 3 requests per lookup, to find the best result.
+  lookup: (query, next) ->
+    @search query, "releases", (err, res) =>
+      return next err if err
+
+      results = res?.searchresults?.results
+      return next new Error "No hits" unless results
+
+      masters = (result for result in results when result.type is "master")
+      # Did we find masters already?
+      results = masters if masters.length
+
+      matches = (result for result in results when result.title is query)
+      # Take only the best results
+      results = matches if matches.length
+
+      release = results[0]
+      id = release.uri.split("/").pop()
+
+      @[release.type] id, (err, res) =>
+        if "master_id" of res
+          # Did we find a master now?
+          @master res.master_id, next
+        else if "main_release" of res
+          # Or maybe a main release?
+          @release res.main_release, next
+        else
+          # This is the best we can do
+          next null, res

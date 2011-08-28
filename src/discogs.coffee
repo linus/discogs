@@ -89,7 +89,7 @@ exports = module.exports = (format) ->
       # Did we find masters already?
       results = masters if masters.length
 
-      matches = (result for result in results when result.title is query)
+      matches = (result for result in results when result.title.toLowerCase() is query.toLowerCase())
       # Take only the best results
       results = matches if matches.length
 

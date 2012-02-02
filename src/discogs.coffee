@@ -34,7 +34,6 @@ exports = module.exports = (format) ->
       uri: getUrl url
       headers: {'accept-encoding': 'gzip'}
       encoding: null
-      proxy: sm.app.Env.getDefault().getHTTPProxy()
       (error, res, body) =>
         if not error and 200 <= res.statusCode < 400 and body
           if res.headers['content-encoding']?.indexOf('gzip') >= 0

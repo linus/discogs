@@ -11,5 +11,5 @@ clean-docs:
 
 clean: clean-docs
 
-dist: clean init
+dist: clean init docs
 	coffee -o lib/ -c src/

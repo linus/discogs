@@ -1,6 +1,6 @@
 querystring = require 'querystring'
 request     = require 'request'
-compress    = require 'compress'
+zlib        = require 'zlib'
 
 # This is the entry point.
 #
@@ -8,8 +8,6 @@ compress    = require 'compress'
 #
 #     client = discogs("xml")
 exports = module.exports = (format) ->
-  gunzip = new compress.Gunzip()
-  gunzip.init()
 
   # Return a proper url with optional format
   getUrl = (url) ->
@@ -21,19 +19,31 @@ exports = module.exports = (format) ->
 
   # Make a request
   discogsRequest = (url, next) ->
+    rparse = (err, res, body) ->
+      if err
+        return next err
+      if res.headers['content-type']?.indexOf('json') >= 0 or not format
+        try
+          body = JSON.parse(body)
+        catch e
+          err = e
+          body = null
+      next err, body
+
     request
       uri: getUrl url
       headers: {'accept-encoding': 'gzip'}
-      encoding: 'binary'
+      encoding: null
+      proxy: sm.app.Env.getDefault().getHTTPProxy()
       (error, res, body) =>
-        if not error and 200 <= res.statusCode < 400
-          if body
-            body = gunzip.inflate(body) if 'gzip' in res.headers['content-type']
-            body = JSON.parse(body) if 'json' in res.headers['content-type'] or not format
-
-          next null, body
-        else
-          next error
+        if not error and 200 <= res.statusCode < 400 and body
+          if res.headers['content-encoding']?.indexOf('gzip') >= 0
+            zlib.gunzip body, (err, body) =>
+              rparse err, res, body
+          else
+            rparse null, res, body
+          return
+        next error
 
   responseHandler = (type, next) ->
     (err, res) ->

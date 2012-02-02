@@ -19,28 +19,31 @@ exports = module.exports = (format) ->
 
   # Make a request
   discogsRequest = (url, next) ->
-    rparse = (err, body) ->
+    rparse = (err, res, body) ->
       if err
-        next err
-      if 'json' in res.headers['content-type'] or not format
-        body = JSON.parse(body)
-      next null, body
+        return next err
+      if res.headers['content-type']?.indexOf('json') >= 0 or not format
+        try
+          body = JSON.parse(body)
+        catch e
+          err = e
+          body = null
+      next err, body
 
     request
       uri: getUrl url
       headers: {'accept-encoding': 'gzip'}
-      encoding: 'binary'
+      encoding: null
       proxy: sm.app.Env.getDefault().getHTTPProxy()
       (error, res, body) =>
-        if not error and 200 <= res.statusCode < 400
-          if body
-            if 'gzip' in res.headers['content-encoding']
-              zlib.unzip body, (err, body) =>
-                rparse err, body
-            else
-              rparse err, body
-        else
-          next error
+        if not error and 200 <= res.statusCode < 400 and body
+          if res.headers['content-encoding']?.indexOf('gzip') >= 0
+            zlib.gunzip body, (err, body) =>
+              rparse err, res, body
+          else
+            rparse null, res, body
+          return
+        next error
 
   responseHandler = (type, next) ->
     (err, res) ->

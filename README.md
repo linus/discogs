@@ -4,19 +4,18 @@ Discogs: A simple JavaScript wrapper for the Discogs API
 `discogs` is a simple wrapper for the [Discogs API](http://www.discogs.com/help/api), written in CoffeeScript and usable in e.g. Node.js.
 
 ## Version
-0.4.0
+0.4.1
 
 ## Requirements
 
-- [Node](http://github.com/ry/node)
-- [request](http://github.com/mikeal/request)
-- [node-compress](http://github.com/waveto/node-compress)
+- [Node](https://github.com/ry/node)
+- [request](https://github.com/mikeal/request)
 
 ## Installation
 
-Recommended installation is using [npm](http://github.com/isaacs/npm)
+Recommended installation is using [npm](https://github.com/isaacs/npm)
 
-    npm bundle discogs
+    npm install discogs
 
 ## Usage
 
@@ -31,13 +30,14 @@ Recommended installation is using [npm](http://github.com/isaacs/npm)
 ## Credits
 
 Linus G Thiel &lt;linus@hanssonlarsson.se&gt;
+[Adamansky Anton](https://github.com/adamansky) - Node 0.6 support
 
 ## Thank you
 
 - [Discogs](http://discogs.com/) for an outstanding service and a great API
-- [Ryan Dahl](http://github.com/ry) for the awesome Node.js
-- [Jeremy Ashkenas](http://github.com/jashkenas) for the beautiful CoffeeScript and Docco
-- [Mikeal Rogers](http://github.com/mikeal) for request
+- [Ryan Dahl](https://github.com/ry) for the awesome Node.js
+- [Jeremy Ashkenas](https://github.com/jashkenas) for the beautiful CoffeeScript and Docco
+- [Mikeal Rogers](https://github.com/mikeal) for request
 
 ## License 
 

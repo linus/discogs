@@ -1,29 +1,37 @@
 <!DOCTYPE html>  <html> <head>   <title>discogs.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               discogs.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nv">querystring = </span><span class="nx">require</span> <span class="s1">&#39;querystring&#39;</span>
 <span class="nv">request     = </span><span class="nx">require</span> <span class="s1">&#39;request&#39;</span>
-<span class="nv">compress    = </span><span class="nx">require</span> <span class="s1">&#39;compress&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>This is the entry point.</p>
+<span class="nv">zlib        = </span><span class="nx">require</span> <span class="s1">&#39;zlib&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>This is the entry point.</p>
 
 <p>Takes an optional format parameter, defaulting to 'json'. If 'xml' consumer is expected to take care of parsing</p>
 
 <pre><code>client = discogs("xml")
-</code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">exports = module.exports = </span><span class="nf">(format) -&gt;</span>
-  <span class="nv">gunzip = </span><span class="k">new</span> <span class="nx">compress</span><span class="p">.</span><span class="nx">Gunzip</span><span class="p">()</span>
-  <span class="nx">gunzip</span><span class="p">.</span><span class="nx">init</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Return a proper url with optional format</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getUrl = </span><span class="nf">(url) -&gt;</span>
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">exports = module.exports = </span><span class="nf">(format) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Return a proper url with optional format</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getUrl = </span><span class="nf">(url) -&gt;</span>
     <span class="nv">sep = </span><span class="k">if</span> <span class="s2">&quot;?&quot;</span> <span class="k">in</span> <span class="nx">url</span> <span class="k">then</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span>
     <span class="nv">url = </span><span class="s2">&quot;http://api.discogs.com/#{url}&quot;</span> <span class="k">if</span> <span class="nx">url</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">isnt</span> <span class="s1">&#39;http://&#39;</span>
 
     <span class="nx">url</span> <span class="o">+=</span> <span class="s2">&quot;#{sep}f=#{format}&quot;</span> <span class="k">if</span> <span class="nx">format</span>
     <span class="nx">url</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Make a request</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">discogsRequest = </span><span class="nf">(url, next) -&gt;</span>
+    <span class="nv">parseResponse = </span><span class="nf">(err, res, body) -&gt;</span>
+      <span class="k">return</span> <span class="nx">next</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+      <span class="k">if</span> <span class="o">~</span><span class="nx">res</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span><span class="o">?</span><span class="p">.</span><span class="nx">indexOf</span> <span class="s1">&#39;json&#39;</span> <span class="o">or</span> <span class="o">not</span> <span class="nx">format</span>
+        <span class="k">try</span>
+          <span class="nv">body = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span> <span class="nx">body</span>
+        <span class="k">catch</span> <span class="nx">e</span>
+          <span class="nv">err = </span><span class="nx">e</span>
+          <span class="nv">body = </span><span class="kc">null</span>
+        <span class="nx">next</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">body</span>
+
     <span class="nx">request</span>
       <span class="nv">uri: </span><span class="nx">getUrl</span> <span class="nx">url</span>
       <span class="nv">headers: </span><span class="p">{</span><span class="s1">&#39;accept-encoding&#39;</span><span class="o">:</span> <span class="s1">&#39;gzip&#39;</span><span class="p">}</span>
-      <span class="nv">encoding: </span><span class="s1">&#39;binary&#39;</span>
-      <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nv">encoding: </span><span class="kc">null</span>
+      <span class="nf">(error, res, body) -&gt;</span>
         <span class="k">if</span> <span class="o">not</span> <span class="nx">error</span> <span class="o">and</span> <span class="mi">200</span> <span class="o">&lt;=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">&lt;</span> <span class="mi">400</span>
-          <span class="k">if</span> <span class="nx">body</span>
-            <span class="nv">body = </span><span class="nx">gunzip</span><span class="p">.</span><span class="nx">inflate</span><span class="p">(</span><span class="nx">body</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;gzip&#39;</span> <span class="k">in</span> <span class="nx">res</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span>
-            <span class="nv">body = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">body</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;json&#39;</span> <span class="k">in</span> <span class="nx">res</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span> <span class="o">or</span> <span class="o">not</span> <span class="nx">format</span>
-
-          <span class="nx">next</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">body</span>
+          <span class="k">if</span> <span class="o">~</span><span class="nx">res</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s1">&#39;content-encoding&#39;</span><span class="p">]</span><span class="o">?</span><span class="p">.</span><span class="nx">indexOf</span> <span class="s1">&#39;gzip&#39;</span>
+            <span class="nx">zlib</span><span class="p">.</span><span class="nx">gunzip</span> <span class="nx">body</span><span class="p">,</span> <span class="nf">(err, body) -&gt;</span>
+              <span class="nx">parseResponse</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">body</span>
+          <span class="k">else</span>
+            <span class="nx">parseResponse</span> <span class="nx">error</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">body</span>
         <span class="k">else</span>
           <span class="nx">next</span> <span class="nx">error</span>
 

@@ -20,7 +20,7 @@ exports = module.exports = (format) ->
   discogsRequest = (url, next) ->
     parseResponse = (err, res, body) ->
       return next err if err
-      if ~res.headers['content-type']?.indexOf 'json' or not format
+      if ~res.headers['content-type']?.indexOf('json') or not format
         try
           body = JSON.parse body
         catch e

@@ -3,7 +3,10 @@
   "description": "Simple client for Discogs API",
   "version": "0.4.3",
   "homepage": "https://github.com/linus/discogs",
-  "repository": "https://github.com/linus/discogs.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/linus/discogs.git"
+  },
   "author": "Linus G Thiel <linus@hanssonlarsson.se> (http://hanssonlarsson.se/)",
   "contributors": [
     { "name": "Linus G Thiel", "email": "linus@hanssonlarsson.se" },

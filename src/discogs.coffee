@@ -1,6 +1,7 @@
 querystring = require 'querystring'
 request     = require 'request'
 zlib        = require 'zlib'
+discogs     = require '../package.json'
 
 # This is the entry point.
 #
@@ -8,29 +9,35 @@ zlib        = require 'zlib'
 #
 #     client = discogs("xml")
 exports = module.exports = (format) ->
+  format = null if format is 'json' # JSON is the default and the API doesn't work with f=json
   # Return a proper url with optional format
   getUrl = (url) ->
-    sep = if "?" in url then "&" else "?"
+
     url = "http://api.discogs.com/#{url}" if url.substr(0, 7) isnt 'http://'
+    sep = if "?" in url then "&" else "?"
 
     url += "#{sep}f=#{format}" if format
     url
 
   # Make a request
   discogsRequest = (url, next) ->
+
     parseResponse = (err, res, body) ->
-      return next err if err
-      if ~res.headers['content-type']?.indexOf('json') or not format
+
+      if err then next err
+      else if ~res.headers['content-type']?.indexOf('json') or not format
         try
-          body = JSON.parse body
+          next null, JSON.parse body
         catch e
-          err = e
-          body = null
-        next err, body
+          next e
+      else
+        next null, body
 
     request
       uri: getUrl url
-      headers: {'accept-encoding': 'gzip'}
+      headers:
+        'accept-encoding': 'gzip'
+        'user-agent': "#{discogs.name}/#{discogs.version} +#{discogs.homepage}"
       encoding: null
       (error, res, body) ->
         if not error and 200 <= res.statusCode < 400
@@ -38,14 +45,14 @@ exports = module.exports = (format) ->
             zlib.gunzip body, (err, body) ->
               parseResponse err, res, body
           else
-            parseResponse error, res, body
+            parseResponse error, res, body.toString 'utf8'
         else
           next error
 
-  responseHandler = (type, next) ->
-    (err, res) ->
-      return next(err, res) if err or res not instanceof Object or type not of res?.resp
-      next(null, res.resp[type])
+  responseHandler = (type, next) -> (err, res) ->
+
+      if err then next err
+      else next null, res?.resp?[type]
 
   # API
 
@@ -53,7 +60,7 @@ exports = module.exports = (format) ->
   get: (url, next) ->
     discogsRequest url, next
 
-  # Get a release
+  # Get a master release
   master: (id, next) ->
     discogsRequest 'master/' + id,
       responseHandler('master', next)
